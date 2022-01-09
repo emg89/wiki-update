@@ -99,6 +99,7 @@ print()
 
 for company in companies[1:]:
 	item = company[0]
+	print(item)
 	claims = getclaims(item)
 	existing_props = claims.keys()
 
