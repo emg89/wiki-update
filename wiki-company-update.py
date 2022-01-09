@@ -60,7 +60,7 @@ def createclaim(editToken, subjectQNumber, propertyPNumber, insert_value):
 	}
 	j = session.post(endpointUrl, data=parameters).json()
 	if 'error' in j.keys():
-		print('pause due to max lag')
+		print('pause due to max lag, dont retry')
 		time.sleep(pause_time)
 
 	return j
