@@ -1,9 +1,11 @@
 import requests
 import json
 import csv
+import time
 
-# endpointUrl = 'https://www.wikidata.org/w/api.php'
-endpointUrl = 'https://test.wikidata.org/w/api.php'
+endpointUrl = 'https://www.wikidata.org/w/api.php'
+# endpointUrl = 'https://test.wikidata.org/w/api.php'
+pause_time = 5
 session = requests.Session()
 
 def retrieveCredentials():
@@ -53,9 +55,14 @@ def createclaim(editToken, subjectQNumber, propertyPNumber, insert_value):
 		'bot':'1',
 		'token': editToken,
 		'property': propertyPNumber,
-		'value': '"' + insert_value + '"'
+		'value': '"' + insert_value + '"',
+		'maxlag':'5'
 	}
 	j = session.post(endpointUrl, data=parameters).json()
+	if 'error' in j.keys():
+		print('pause due to max lag')
+		time.sleep(pause_time)
+
 	return j
 
 def getclaims(wiki_id):
@@ -69,7 +76,8 @@ def getclaims(wiki_id):
 
 
 # *** MAIN SCRIPT ***
-update_list = 'test-update-list.csv' 
+# update_list = 'test-update-list.csv'
+update_list = 'wikidata-update-list.csv'
 with open(update_list, newline='', encoding="utf-8") as f:
 	reader = csv.reader(f)
 	companies = list(reader)
@@ -97,7 +105,6 @@ for company in companies[1:]:
 	for prop in props:
 		insert_value = company[props.index(prop)+1]
 		if prop not in existing_props and len(insert_value)>0:
-			print(insert_value)
 			csrfToken = getCsrfToken()
 			data = createclaim(csrfToken, item, prop, insert_value)
 			print('Write confirmation: ', data)
